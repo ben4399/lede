@@ -1,4 +1,4 @@
-name: Lean's OpenWrt
+name: Lean's OpenWrt 同步源码
 
 on:
   schedule:
@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: 检测
         uses: actions/checkout@master
         with:
           ref: master
 
-      - name: Space cleanup
+      - name: 清理空间
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
@@ -30,13 +30,18 @@ jobs:
           sudo -E apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
+      - name: 同步最新的源码
+        run: |
+          git remote add openwrt https://github.com/coolsnowwolf/lede.git
+          git pull openwrt master
+          git remote -v
           df -h
-      - name: Update feeds
+      - name: 更新源
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      - name: Generate configuration file
+      - name: 生成配置文件
         run: |
           rm -f ./.config*
           touch ./.config
@@ -129,12 +134,12 @@ jobs:
 
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
-  
-      - name: Make download
+
+      - name: 进行下载
         run: |
           make download -j8
           find dl -size -1024c -exec rm -f {} \;
-      - name: Compile firmware
+      - name: 编译固件
         run: |
           make -j$(nproc) || make -j1 V=s
           echo "======================="
@@ -145,10 +150,10 @@ jobs:
           du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
           du -h --max-depth=1 ./build_dir
           du -h --max-depth=1 ./bin
-      - name: Prepare artifact
+      - name: 准备打包
         run: find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
 
-      - name: Upload artifact
+      - name: 上传打包
         uses: actions/upload-artifact@master
         with:
           name: OpenWrt firmware
