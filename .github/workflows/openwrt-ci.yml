@@ -134,7 +134,7 @@ jobs:
 
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
-		  
+  
       - name: 进行下载
         run: |
           make download -j8
