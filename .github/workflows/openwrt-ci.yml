@@ -1,4 +1,4 @@
-name: Lean's OpenWrt 2020.03.12 15:55
+name: Lean's OpenWrt 2020.03.13 09:28 添加应用过滤
 
 on:
   schedule:
@@ -31,6 +31,15 @@ jobs:
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
           df -h
+      - name: 自定义插件主题。
+        run: |
+          cd package
+          mkdir openwrt-packages
+          cd openwrt-packages
+          git clone https://github.com/openwrt-develop/luci-theme-atmaterial.git # 主题
+          git clone https://github.com/Ameykyl/luci-app-koolproxyR # 广告过滤
+          git clone https://github.com/rosywrt/luci-theme-rosy # 主题
+          git clone https://github.com/destan19/OpenAppFilter.git # 应用过滤
       - name: 更新源
         run: |
           ./scripts/feeds update -a
@@ -104,6 +113,9 @@ jobs:
           CONFIG_PACKAGE_luci-app-mwan3=y # MWAN3分流助手
           CONFIG_PACKAGE_luci-i18n-mwan3-zh-cn=y
           CONFIG_PACKAGE_luci-i18n-mwan3helper-zh-cn=y
+          CONFIG_PACKAGE_oaf=y # 应用过滤内核模块包
+          CONFIG_PACKAGE_open-app-filter=y # 应用层服务和脚本
+          CONFIG_PACKAGE_luci-app-oaf=y # 界面安装包，包含中文语言包
           EOF
 
           # LuCI主题:
