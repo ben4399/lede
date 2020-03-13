@@ -1,4 +1,4 @@
-name: Lean's OpenWrt 2020.03.13 09:28 添加应用过滤
+name: Lean's OpenWrt 2020.03.13 09:56 添加应用过滤
 
 on:
   schedule:
@@ -33,7 +33,7 @@ jobs:
           df -h
       - name: 自定义插件
         run: |
-           rm    -rfv  package/lean/autocore
+           cd package
            git clone https://github.com/destan19/OpenAppFilter.git # 应用过滤
       - name: 更新源
         run: |
